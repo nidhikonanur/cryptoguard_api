@@ -1,0 +1,6 @@
+__pycache__/
+.pytest_cache/
+.venv/
+*.pyc
+cryptoguard.db
+test_cryptoguard.db
