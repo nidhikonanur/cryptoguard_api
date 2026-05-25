@@ -3,6 +3,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 
 from app.db import init_db
 from app.routes import audit, orders, transfers
@@ -26,6 +27,11 @@ app = FastAPI(
 app.include_router(transfers.router)
 app.include_router(orders.router)
 app.include_router(audit.router)
+
+
+@app.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/health", response_model=HealthResponse, tags=["health"])
