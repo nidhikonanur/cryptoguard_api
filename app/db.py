@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import os
 from collections.abc import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 
-DATABASE_URL = "sqlite:///./cryptoguard.db"
+DEFAULT_DATABASE_URL = "sqlite:////tmp/cryptoguard.db" if os.getenv("VERCEL") else "sqlite:///./cryptoguard.db"
+DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 
 engine = create_engine(
     DATABASE_URL,

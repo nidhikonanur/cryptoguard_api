@@ -80,6 +80,12 @@ uvicorn app.main:app --reload
 
 API docs are available at `http://127.0.0.1:8000/docs`.
 
+By default the app stores data in `./cryptoguard.db`. Set `DATABASE_URL` to override the SQLite database location in hosted environments:
+
+```bash
+DATABASE_URL=sqlite:///./cryptoguard.db uvicorn app.main:app --reload
+```
+
 ## Tests
 
 ```bash
@@ -92,6 +98,39 @@ pytest
 ```bash
 source .venv/bin/activate
 PYTHONPATH=. python scripts/benchmark_latency.py
+```
+
+## Deploy
+
+### Render
+
+This repo includes `render.yaml` for Render blueprint deploys.
+
+1. Push this repository to GitHub.
+2. In Render, choose **New > Blueprint** and select this repo.
+3. Render will install `requirements.txt`, start the API with Gunicorn/Uvicorn, and use `/health` for health checks.
+
+The blueprint uses Render's free plan. Free web services have an ephemeral filesystem, so the local SQLite database is for demo use and resets on restarts, redeploys, or idle spin-downs.
+
+The production start command is:
+
+```bash
+gunicorn app.main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+```
+
+### Docker
+
+```bash
+docker build -t cryptoguard-api .
+docker run --rm -p 8000:8000 -e DATABASE_URL=sqlite:////data/cryptoguard.db -v cryptoguard-data:/data cryptoguard-api
+```
+
+### Vercel
+
+This repo also includes `api/index.py` and `vercel.json` for Vercel's FastAPI runtime. Connect the repo in Vercel or run:
+
+```bash
+npx vercel --prod
 ```
 
 ## Safety Notes
